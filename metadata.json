@@ -1,0 +1,8 @@
+{
+  "name": "SunRise Greenhouses CMS",
+  "description": "A high-end, CMS-powered corporate website for agricultural projects with 360° panoramas and a full admin dashboard.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

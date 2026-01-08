@@ -2,12 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { SiteSettings } from '../types';
+import { SiteSettings, Project } from '../types';
 import { ICONS } from '../constants';
+import { projectsService } from '../services/projectsService';
+import { servicesService } from '../services/servicesService';
 
 const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
   const [submitted, setSubmitted] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +30,20 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  // Load featured projects
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        const projects = await projectsService.getProjects();
+        const featured = projects.filter(p => p.is_featured).slice(0, 3);
+        setFeaturedProjects(featured);
+      } catch (error) {
+        console.error('Error loading projects:', error);
+      }
+    };
+    loadProjects();
+  }, []);
+
   return (
     <div className="relative">
       {/* 1. CINEMATIC HERO WITH PARALLAX */}
@@ -34,7 +51,7 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://cdn.pixabay.com/photo/2016/02/17/23/03/greenhouse-1206397_1280.jpg" 
+            src={settings.hero_panorama_url || 'https://cdn.pixabay.com/photo/2016/02/17/23/03/greenhouse-1206397_1280.jpg'} 
             alt="greenhouse"
             className="w-full h-full object-cover"
             onError={(e) => {
@@ -207,28 +224,28 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-8 px-6 max-w-[1600px] mx-auto overflow-hidden">
-            {[
-              { name: 'مشروع الصوبات الذكية - المنيا', type: 'صوبات هيدروبونيك', img: 'https://cdn.pixabay.com/photo/2016/02/17/23/03/greenhouse-1206397_1280.jpg' },
-              { name: 'مجمع مزارع الفراولة - الإسماعيلية', type: 'صوبات شبكية متطورة', img: 'https://cdn.pixabay.com/photo/2015/01/08/18/27/fruits-593380_1280.jpg' },
-              { name: 'إنتاج خضروات التصدير - البحيرة', type: 'أنظمة ري أوتوماتيكية', img: 'https://cdn.pixabay.com/photo/2016/11/21/14/31/vegetables-1846069_1280.jpg' },
-            ].map((p, i) => (
+            {(featuredProjects.length > 0 ? featuredProjects : [
+              { id: '1', title_ar: 'مشروع الصوبات الذكية - المنيا', location: 'المنيا', crop_type: 'صوبات هيدروبونيك', main_image_url: 'https://cdn.pixabay.com/photo/2016/02/17/23/03/greenhouse-1206397_1280.jpg', is_featured: true, created_at: '' },
+              { id: '2', title_ar: 'مجمع مزارع الفراولة - الإسماعيلية', location: 'الإسماعيلية', crop_type: 'صوبات شبكية متطورة', main_image_url: 'https://cdn.pixabay.com/photo/2015/01/08/18/27/fruits-593380_1280.jpg', is_featured: true, created_at: '' },
+              { id: '3', title_ar: 'إنتاج خضروات التصدير - البحيرة', location: 'البحيرة', crop_type: 'أنظمة ري أوتوماتيكية', main_image_url: 'https://cdn.pixabay.com/photo/2016/11/21/14/31/vegetables-1846069_1280.jpg', is_featured: true, created_at: '' },
+            ]).map((p) => (
               <motion.div 
-                key={i} 
+                key={p.id} 
                 className="relative h-[600px] flex-1 min-w-[350px] rounded-[3rem] overflow-hidden group shadow-xl"
               >
                 <img 
-                  src={p.img} 
+                  src={p.main_image_url} 
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
                   alt="project" 
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
-                    img.src = 'https://via.placeholder.com/1200x600?text=' + p.name;
+                    img.src = 'https://via.placeholder.com/1200x600?text=' + p.title_ar;
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent p-12 flex flex-col justify-end">
                   <div className="translate-y-6 group-hover:translate-y-0 transition-transform duration-500">
-                    <span className="bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-black mb-4 inline-block">{p.type}</span>
-                    <h5 className="text-3xl font-black text-white mb-4 leading-tight">{p.name}</h5>
+                    <span className="bg-emerald-500 text-white px-4 py-1 rounded-full text-xs font-black mb-4 inline-block">{p.crop_type}</span>
+                    <h5 className="text-3xl font-black text-white mb-4 leading-tight">{p.title_ar}</h5>
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                       <p className="text-white/70 mb-8 text-lg">تم التنفيذ خلال ٩٠ يوماً بأعلى المواصفات العالمية.</p>
                       <Link to="/projects" className="text-emerald-400 font-bold flex items-center gap-2 underline underline-offset-8">تفاصيل المشروع الكاملة</Link>

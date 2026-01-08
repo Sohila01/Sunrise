@@ -21,14 +21,17 @@ const Navbar: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${bgColor}`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-4 group">
-          {settings.logo_url ? (
+          {settings.logo_url && settings.logo_url.startsWith('http') ? (
             <img 
               src={settings.logo_url} 
               alt="logo"
               className="h-12 w-12 object-cover rounded-full group-hover:scale-110 transition-transform"
+              loading="eager"
               onError={(e) => {
                 const img = e.target as HTMLImageElement;
-                img.style.display = 'none';
+                if (!img.src.includes('fallback')) {
+                  img.src = 'https://images.unsplash.com/photo-1560493676-04071c5f467b?w=48&h=48&fit=crop&fallback=1';
+                }
               }}
             />
           ) : null}

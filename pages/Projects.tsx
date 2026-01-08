@@ -159,12 +159,12 @@ const Projects: React.FC = () => {
                     <motion.img
                       src={project.main_image_url}
                       alt={project.title_ar}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover bg-slate-300"
                       whileHover={{ scale: 1.12 }}
                       transition={{ duration: 0.8, ease: 'easeOut' }}
                       onError={(e) => {
                         const img = e.target as HTMLImageElement;
-                        img.src = 'https://via.placeholder.com/600x500?text=' + project.title_ar;
+                        img.src = 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=600&q=80';
                       }}
                     />
 

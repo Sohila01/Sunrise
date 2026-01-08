@@ -108,12 +108,12 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src={settings.hero_panorama_url || 'https://cdn.pixabay.com/photo/2016/02/17/23/03/greenhouse-1206397_1280.jpg'} 
+            src={settings.hero_panorama_url || 'https://images.unsplash.com/photo-1585059895311-9e73b4d45863?w=1920&q=80'} 
             alt="greenhouse"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover bg-slate-700"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
-              img.src = 'https://via.placeholder.com/1920x1080?text=Sunrise+Greenhouses';
+              img.src = 'https://images.unsplash.com/photo-1559056199-641a0ac8b3f4?w=1920&q=80';
             }}
           />
         </div>
@@ -290,9 +290,9 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
         
         <div className="flex flex-col md:flex-row gap-8 px-6 max-w-[1600px] mx-auto overflow-hidden">
             {(featuredProjects.length > 0 ? featuredProjects : [
-              { id: '1', title_ar: 'مشروع الصوبات الذكية - المنيا', location: 'المنيا', crop_type: 'صوبات هيدروبونيك', main_image_url: 'https://cdn.pixabay.com/photo/2016/02/17/23/03/greenhouse-1206397_1280.jpg', is_featured: true, created_at: '' },
-              { id: '2', title_ar: 'مجمع مزارع الفراولة - الإسماعيلية', location: 'الإسماعيلية', crop_type: 'صوبات شبكية متطورة', main_image_url: 'https://cdn.pixabay.com/photo/2015/01/08/18/27/fruits-593380_1280.jpg', is_featured: true, created_at: '' },
-              { id: '3', title_ar: 'إنتاج خضروات التصدير - البحيرة', location: 'البحيرة', crop_type: 'أنظمة ري أوتوماتيكية', main_image_url: 'https://cdn.pixabay.com/photo/2016/11/21/14/31/vegetables-1846069_1280.jpg', is_featured: true, created_at: '' },
+              { id: '1', title_ar: 'مشروع الصوبات الذكية - المنيا', location: 'المنيا', crop_type: 'صوبات هيدروبونيك', main_image_url: 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=800&q=80', is_featured: true, created_at: '' },
+              { id: '2', title_ar: 'مجمع مزارع الفراولة - الإسماعيلية', location: 'الإسماعيلية', crop_type: 'صوبات شبكية متطورة', main_image_url: 'https://images.unsplash.com/photo-1585059895311-9e73b4d45863?w=800&q=80', is_featured: true, created_at: '' },
+              { id: '3', title_ar: 'إنتاج خضروات التصدير - البحيرة', location: 'البحيرة', crop_type: 'أنظمة ري أوتوماتيكية', main_image_url: 'https://images.unsplash.com/photo-1563832040-a3d5e15fbb10?w=800&q=80', is_featured: true, created_at: '' },
             ]).map((p) => (
               <motion.div 
                 key={p.id} 
@@ -300,11 +300,11 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
               >
                 <img 
                   src={p.main_image_url} 
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 bg-slate-300" 
                   alt="project" 
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
-                    img.src = 'https://via.placeholder.com/1200x600?text=' + p.title_ar;
+                    img.src = 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=1200&q=80';
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent p-12 flex flex-col justify-end">

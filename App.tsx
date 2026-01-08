@@ -41,6 +41,7 @@ const App: React.FC = () => {
       } catch (error) {
         console.error('Failed to load settings:', error);
         // استخدم الإعدادات الافتراضية في حالة الفشل
+        setSettings(MOCK_SETTINGS as any);
       } finally {
         setLoading(false);
       }

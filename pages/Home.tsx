@@ -303,12 +303,15 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
                 className="relative h-[600px] flex-1 min-w-[350px] rounded-[3rem] overflow-hidden group shadow-xl"
               >
                 <img 
-                  src={p.main_image_url} 
+                  src={p.main_image_url && p.main_image_url.startsWith('http') ? p.main_image_url : 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=800&q=80'} 
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 bg-slate-300" 
-                  alt="project" 
+                  alt="project"
+                  loading="lazy"
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
-                    img.src = 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=1200&q=80';
+                    if (!img.src.includes('fallback')) {
+                      img.src = 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=1200&q=80&fallback=1';
+                    }
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent p-12 flex flex-col justify-end">

@@ -6,17 +6,60 @@ import { SiteSettings, Project } from '../types';
 import { ICONS } from '../constants';
 import { projectsService } from '../services/projectsService';
 import { servicesService } from '../services/servicesService';
+import { leadsService } from '../services/leadsService';
 
 const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
   const [projectsLoaded, setProjectsLoaded] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    service: 'إنشاء صوبة زراعية',
+    message: '',
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 5000);
+    setSubmitting(true);
+    try {
+      // حفظ الطلب في Supabase
+      await leadsService.createLead({
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        message: `${formData.service}\n\n${formData.message}`,
+        status: 'new',
+      });
+      
+      // إعادة تعيين النموذج
+      setFormData({
+        name: '',
+        phone: '',
+        email: '',
+        service: 'إنشاء صوبة زراعية',
+        message: '',
+      });
+      
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // Parallax effect on mouse move
@@ -331,20 +374,49 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
                     <label className="block text-slate-400 font-black text-xs uppercase mb-3 tracking-widest">الاسم الكامل</label>
-                    <input required type="text" className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" placeholder="أحمد محمد" />
+                    <input 
+                      required 
+                      type="text" 
+                      name="name"
+                      value={formData.name}
+                      onChange={handleFormChange}
+                      className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" 
+                      placeholder="أحمد محمد" 
+                    />
                   </div>
                   <div>
                     <label className="block text-slate-400 font-black text-xs uppercase mb-3 tracking-widest">رقم الجوال</label>
-                    <input required type="tel" className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" placeholder="012xxxxxxx" />
+                    <input 
+                      required 
+                      type="tel" 
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleFormChange}
+                      className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" 
+                      placeholder="012xxxxxxx" 
+                    />
                   </div>
                 </div>
                 <div>
                   <label className="block text-slate-400 font-black text-xs uppercase mb-3 tracking-widest">البريد الإلكتروني</label>
-                  <input type="email" className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" placeholder="name@company.com" />
+                  <input 
+                    required
+                    type="email" 
+                    name="email"
+                    value={formData.email}
+                    onChange={handleFormChange}
+                    className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" 
+                    placeholder="name@company.com" 
+                  />
                 </div>
                 <div>
                   <label className="block text-slate-400 font-black text-xs uppercase mb-3 tracking-widest">نوع الخدمة المطلوبة</label>
-                  <select className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold appearance-none">
+                  <select 
+                    name="service"
+                    value={formData.service}
+                    onChange={handleFormChange}
+                    className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold appearance-none"
+                  >
                     <option>إنشاء صوبة زراعية</option>
                     <option>تطوير نظام ري</option>
                     <option>إشراف زراعي كامل</option>
@@ -353,10 +425,21 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
                 </div>
                 <div>
                   <label className="block text-slate-400 font-black text-xs uppercase mb-3 tracking-widest">رسالتك / تفاصيل المشروع</label>
-                  <textarea rows={5} className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" placeholder="اكتب لنا أي تفاصيل إضافية هنا..."></textarea>
+                  <textarea 
+                    rows={5} 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleFormChange}
+                    className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" 
+                    placeholder="اكتب لنا أي تفاصيل إضافية هنا..."
+                  ></textarea>
                 </div>
-                <button type="submit" className="bg-emerald-600 text-white py-6 rounded-2xl font-black text-xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-200">
-                  إرسال الطلب الآن
+                <button 
+                  type="submit" 
+                  disabled={submitting}
+                  className="bg-emerald-600 text-white py-6 rounded-2xl font-black text-xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? 'جاري الإرسال...' : 'إرسال الطلب الآن'}
                 </button>
               </form>
             </div>

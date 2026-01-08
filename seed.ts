@@ -1,4 +1,4 @@
-import { supabase } from './src/lib/supabase.js';
+import { supabase } from './lib/supabase';
 import { randomUUID } from 'crypto';
 
 const uuidv4 = randomUUID;

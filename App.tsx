@@ -5,6 +5,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
+import ThankYou from './pages/ThankYou';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminLogin from './pages/admin/Login';
 import AdminSettings from './pages/admin/Settings';
@@ -69,6 +70,16 @@ const App: React.FC = () => {
               <Navbar settings={settings} />
               <main className="flex-grow">
                 <Projects />
+              </main>
+              <Footer settings={settings} />
+            </>
+          } />
+
+          <Route path="/thankyou" element={
+            <>
+              <Navbar settings={settings} />
+              <main className="flex-grow">
+                <ThankYou />
               </main>
               <Footer settings={settings} />
             </>

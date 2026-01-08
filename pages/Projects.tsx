@@ -157,14 +157,17 @@ const Projects: React.FC = () => {
                   {/* Image Container */}
                   <div className="relative h-80 overflow-hidden bg-slate-200">
                     <motion.img
-                      src={project.main_image_url}
+                      src={project.main_image_url && project.main_image_url.startsWith('http') ? project.main_image_url : 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=600&h=400&q=80'}
                       alt={project.title_ar}
                       className="w-full h-full object-cover bg-slate-300"
+                      loading="lazy"
                       whileHover={{ scale: 1.12 }}
                       transition={{ duration: 0.8, ease: 'easeOut' }}
                       onError={(e) => {
                         const img = e.target as HTMLImageElement;
-                        img.src = 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=600&q=80';
+                        if (!img.src.includes('fallback')) {
+                          img.src = 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=600&h=400&q=80&fallback=1';
+                        }
                       }}
                     />
 

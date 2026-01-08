@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { SiteSettings, Project } from '../types';
 import { ICONS } from '../constants';
 import { projectsService } from '../services/projectsService';
@@ -9,6 +9,7 @@ import { servicesService } from '../services/servicesService';
 import { leadsService } from '../services/leadsService';
 
 const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
+  const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -52,8 +53,8 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
         message: '',
       });
       
-      setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 5000);
+      // التنقل إلى صفحة الشكر
+      navigate('/thankyou');
     } catch (error) {
       console.error('Error submitting form:', error);
       alert('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.');
@@ -108,12 +109,15 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src={settings.hero_panorama_url || 'https://images.unsplash.com/photo-1585059895311-9e73b4d45863?w=1920&q=80'} 
+            src={settings.hero_panorama_url && settings.hero_panorama_url.startsWith('http') ? settings.hero_panorama_url : 'https://images.unsplash.com/photo-1585059895311-9e73b4d45863?w=1920&h=1080&q=80'} 
             alt="greenhouse"
             className="w-full h-full object-cover bg-slate-700"
+            loading="lazy"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
-              img.src = 'https://images.unsplash.com/photo-1559056199-641a0ac8b3f4?w=1920&q=80';
+              if (!img.src.includes('fallback')) {
+                img.src = 'https://images.unsplash.com/photo-1559056199-641a0ac8b3f4?w=1920&h=1080&q=80&fallback=1';
+              }
             }}
           />
         </div>

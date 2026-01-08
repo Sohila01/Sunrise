@@ -11,8 +11,6 @@ interface Props {
 const AdminSettings: React.FC<Props> = ({ settings, onUpdate }) => {
   const [formData, setFormData] = useState(settings);
   const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     setFormData(settings);
@@ -22,17 +20,12 @@ const AdminSettings: React.FC<Props> = ({ settings, onUpdate }) => {
     e.preventDefault();
     try {
       setLoading(true);
-      setErrorMessage('');
-      setSuccessMessage('');
-      
       const updated = await settingsService.updateSettings(formData);
       onUpdate(updated);
-      setSuccessMessage('تم حفظ الإعدادات بنجاح! ✅');
-      setTimeout(() => setSuccessMessage(''), 3000);
-    } catch (error: any) {
+      alert('تم حفظ الإعدادات بنجاح!');
+    } catch (error) {
       console.error('Failed to update settings:', error);
-      const errorMsg = error?.message || 'فشل في حفظ الإعدادات';
-      setErrorMessage(`❌ خطأ: ${errorMsg}`);
+      alert('فشل في حفظ الإعدادات');
     } finally {
       setLoading(false);
     }
@@ -41,18 +34,6 @@ const AdminSettings: React.FC<Props> = ({ settings, onUpdate }) => {
   return (
     <div className="max-w-4xl">
       <h1 className="text-3xl font-black mb-10">إعدادات الموقع والهوية</h1>
-
-      {successMessage && (
-        <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-800 rounded-xl font-bold">
-          {successMessage}
-        </div>
-      )}
-      
-      {errorMessage && (
-        <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-800 rounded-xl font-bold">
-          {errorMessage}
-        </div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 space-y-6">

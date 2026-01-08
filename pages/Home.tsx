@@ -1,66 +1,22 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { SiteSettings, Project } from '../types';
 import { ICONS } from '../constants';
 import { projectsService } from '../services/projectsService';
 import { servicesService } from '../services/servicesService';
-import { leadsService } from '../services/leadsService';
 
 const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
-  const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
   const [projectsLoaded, setProjectsLoaded] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    service: 'إنشاء صوبة زراعية',
-    message: '',
-  });
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    try {
-      // حفظ الطلب في Supabase
-      await leadsService.createLead({
-        name: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        message: `${formData.service}\n\n${formData.message}`,
-        status: 'new',
-      });
-      
-      // إعادة تعيين النموذج
-      setFormData({
-        name: '',
-        phone: '',
-        email: '',
-        service: 'إنشاء صوبة زراعية',
-        message: '',
-      });
-      
-      // التنقل إلى صفحة الشكر
-      navigate('/thankyou');
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      alert('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.');
-    } finally {
-      setSubmitting(false);
-    }
+    setSubmitted(true);
+    setTimeout(() => setSubmitted(false), 5000);
   };
 
   // Parallax effect on mouse move
@@ -109,15 +65,12 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src={settings.hero_panorama_url && settings.hero_panorama_url.startsWith('http') ? settings.hero_panorama_url : 'https://images.unsplash.com/photo-1585059895311-9e73b4d45863?w=1920&h=1080&q=80'} 
+            src={settings.hero_panorama_url || 'https://cdn.pixabay.com/photo/2016/02/17/23/03/greenhouse-1206397_1280.jpg'} 
             alt="greenhouse"
-            className="w-full h-full object-cover bg-slate-700"
-            loading="lazy"
+            className="w-full h-full object-cover"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
-              if (!img.src.includes('fallback')) {
-                img.src = 'https://images.unsplash.com/photo-1559056199-641a0ac8b3f4?w=1920&h=1080&q=80&fallback=1';
-              }
+              img.src = 'https://via.placeholder.com/1920x1080?text=Sunrise+Greenhouses';
             }}
           />
         </div>
@@ -294,24 +247,21 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
         
         <div className="flex flex-col md:flex-row gap-8 px-6 max-w-[1600px] mx-auto overflow-hidden">
             {(featuredProjects.length > 0 ? featuredProjects : [
-              { id: '1', title_ar: 'مشروع الصوبات الذكية - المنيا', location: 'المنيا', crop_type: 'صوبات هيدروبونيك', main_image_url: 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=800&q=80', is_featured: true, created_at: '' },
-              { id: '2', title_ar: 'مجمع مزارع الفراولة - الإسماعيلية', location: 'الإسماعيلية', crop_type: 'صوبات شبكية متطورة', main_image_url: 'https://images.unsplash.com/photo-1585059895311-9e73b4d45863?w=800&q=80', is_featured: true, created_at: '' },
-              { id: '3', title_ar: 'إنتاج خضروات التصدير - البحيرة', location: 'البحيرة', crop_type: 'أنظمة ري أوتوماتيكية', main_image_url: 'https://images.unsplash.com/photo-1563832040-a3d5e15fbb10?w=800&q=80', is_featured: true, created_at: '' },
+              { id: '1', title_ar: 'مشروع الصوبات الذكية - المنيا', location: 'المنيا', crop_type: 'صوبات هيدروبونيك', main_image_url: 'https://cdn.pixabay.com/photo/2016/02/17/23/03/greenhouse-1206397_1280.jpg', is_featured: true, created_at: '' },
+              { id: '2', title_ar: 'مجمع مزارع الفراولة - الإسماعيلية', location: 'الإسماعيلية', crop_type: 'صوبات شبكية متطورة', main_image_url: 'https://cdn.pixabay.com/photo/2015/01/08/18/27/fruits-593380_1280.jpg', is_featured: true, created_at: '' },
+              { id: '3', title_ar: 'إنتاج خضروات التصدير - البحيرة', location: 'البحيرة', crop_type: 'أنظمة ري أوتوماتيكية', main_image_url: 'https://cdn.pixabay.com/photo/2016/11/21/14/31/vegetables-1846069_1280.jpg', is_featured: true, created_at: '' },
             ]).map((p) => (
               <motion.div 
                 key={p.id} 
                 className="relative h-[600px] flex-1 min-w-[350px] rounded-[3rem] overflow-hidden group shadow-xl"
               >
                 <img 
-                  src={p.main_image_url && p.main_image_url.startsWith('http') ? p.main_image_url : 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=800&q=80'} 
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 bg-slate-300" 
-                  alt="project"
-                  loading="lazy"
+                  src={p.main_image_url} 
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000" 
+                  alt="project" 
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
-                    if (!img.src.includes('fallback')) {
-                      img.src = 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=1200&q=80&fallback=1';
-                    }
+                    img.src = 'https://via.placeholder.com/1200x600?text=' + p.title_ar;
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent p-12 flex flex-col justify-end">
@@ -381,49 +331,20 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
                 <div className="grid md:grid-cols-2 gap-8">
                   <div>
                     <label className="block text-slate-400 font-black text-xs uppercase mb-3 tracking-widest">الاسم الكامل</label>
-                    <input 
-                      required 
-                      type="text" 
-                      name="name"
-                      value={formData.name}
-                      onChange={handleFormChange}
-                      className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" 
-                      placeholder="أحمد محمد" 
-                    />
+                    <input required type="text" className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" placeholder="أحمد محمد" />
                   </div>
                   <div>
                     <label className="block text-slate-400 font-black text-xs uppercase mb-3 tracking-widest">رقم الجوال</label>
-                    <input 
-                      required 
-                      type="tel" 
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleFormChange}
-                      className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" 
-                      placeholder="012xxxxxxx" 
-                    />
+                    <input required type="tel" className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" placeholder="012xxxxxxx" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-slate-400 font-black text-xs uppercase mb-3 tracking-widest">البريد الإلكتروني</label>
-                  <input 
-                    required
-                    type="email" 
-                    name="email"
-                    value={formData.email}
-                    onChange={handleFormChange}
-                    className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" 
-                    placeholder="name@company.com" 
-                  />
+                  <input type="email" className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" placeholder="name@company.com" />
                 </div>
                 <div>
                   <label className="block text-slate-400 font-black text-xs uppercase mb-3 tracking-widest">نوع الخدمة المطلوبة</label>
-                  <select 
-                    name="service"
-                    value={formData.service}
-                    onChange={handleFormChange}
-                    className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold appearance-none"
-                  >
+                  <select className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold appearance-none">
                     <option>إنشاء صوبة زراعية</option>
                     <option>تطوير نظام ري</option>
                     <option>إشراف زراعي كامل</option>
@@ -432,21 +353,10 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
                 </div>
                 <div>
                   <label className="block text-slate-400 font-black text-xs uppercase mb-3 tracking-widest">رسالتك / تفاصيل المشروع</label>
-                  <textarea 
-                    rows={5} 
-                    name="message"
-                    value={formData.message}
-                    onChange={handleFormChange}
-                    className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" 
-                    placeholder="اكتب لنا أي تفاصيل إضافية هنا..."
-                  ></textarea>
+                  <textarea rows={5} className="w-full bg-slate-50 border-none p-5 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 font-bold" placeholder="اكتب لنا أي تفاصيل إضافية هنا..."></textarea>
                 </div>
-                <button 
-                  type="submit" 
-                  disabled={submitting}
-                  className="bg-emerald-600 text-white py-6 rounded-2xl font-black text-xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {submitting ? 'جاري الإرسال...' : 'إرسال الطلب الآن'}
+                <button type="submit" className="bg-emerald-600 text-white py-6 rounded-2xl font-black text-xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-200">
+                  إرسال الطلب الآن
                 </button>
               </form>
             </div>

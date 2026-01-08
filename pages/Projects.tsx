@@ -1,27 +1,19 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Project } from '../types';
-import { projectsService } from '../services/projectsService';
 
 const Projects: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const data = await projectsService.getAllProjects();
-        setProjects(data);
-      } catch (error) {
-        console.error('Error loading projects:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProjects();
-  }, []);
+  const projects: Project[] = [
+    { id: '1', title_ar: 'مشروع الصوبات الذكية - المنيا', location: 'المنيا', crop_type: 'طماطم وفلفل ألوان', main_image_url: 'https://cdn.pixabay.com/photo/2016/02/17/23/03/greenhouse-1206397_1280.jpg', is_featured: true, created_at: new Date().toISOString() },
+    { id: '2', title_ar: 'مجمع مزارع الفراولة - الإسماعيلية', location: 'الإسماعيلية', crop_type: 'فراولة تصدير', main_image_url: 'https://cdn.pixabay.com/photo/2015/01/08/18/27/fruits-593380_1280.jpg', is_featured: true, created_at: new Date().toISOString() },
+    { id: '3', title_ar: 'مزرعة هيدروبونيك - وادي النطرون', location: 'البحيرة', crop_type: 'خضروات ورقية', main_image_url: 'https://cdn.pixabay.com/photo/2016/11/21/14/31/vegetables-1846069_1280.jpg', is_featured: false, created_at: new Date().toISOString() },
+    { id: '4', title_ar: 'مشروع الخيار بالأنابيب - الدقهلية', location: 'الدقهلية', crop_type: 'خيار بانوراميك', main_image_url: 'https://cdn.pixabay.com/photo/2014/12/09/14/23/vegetables-563990_1280.jpg', is_featured: false, created_at: new Date().toISOString() },
+    { id: '5', title_ar: 'صوبات الأزهار الزينة - كفر الشيخ', location: 'كفر الشيخ', crop_type: 'أزهار زينة', main_image_url: 'https://cdn.pixabay.com/photo/2016/05/20/13/39/rose-1405552_1280.jpg', is_featured: false, created_at: new Date().toISOString() },
+    { id: '6', title_ar: 'مزرعة الأعشاب الطبية - الغربية', location: 'الغربية', crop_type: 'نعناع وريحان', main_image_url: 'https://cdn.pixabay.com/photo/2016/02/19/11/29/herbs-1209498_1280.jpg', is_featured: true, created_at: new Date().toISOString() },
+  ];
 
   const categories = [
     { id: 'all', name: 'جميع المشاريع' },
@@ -29,11 +21,7 @@ const Projects: React.FC = () => {
     { id: 'vegetables', name: 'الخضروات' },
   ];
 
-  const filteredProjects = selectedCategory === 'all' 
-    ? projects 
-    : selectedCategory === 'featured' 
-    ? projects.filter(p => p.is_featured) 
-    : projects;
+  const filteredProjects = selectedCategory === 'all' ? projects : selectedCategory === 'featured' ? projects.filter(p => p.is_featured) : projects;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -129,119 +117,103 @@ const Projects: React.FC = () => {
       {/* Projects Grid */}
       <section className="py-20 px-6 bg-slate-50">
         <div className="max-w-7xl mx-auto">
-          {loading ? (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center justify-center min-h-96"
-            >
-              <div className="text-center">
-                <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-slate-600 font-bold">جاري تحميل المشاريع...</p>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-            >
-              {filteredProjects.map((project) => (
-                <motion.div
-                  key={project.id}
-                  variants={itemVariants}
-                  whileHover={{ y: -15 }}
-                  className="group relative bg-white rounded-[2rem] overflow-hidden shadow-lg border border-slate-100 hover:shadow-2xl transition-all duration-500"
-                >
-                  {/* Image Container */}
-                  <div className="relative h-80 overflow-hidden bg-slate-200">
-                    <motion.img
-                      src={project.main_image_url && project.main_image_url.startsWith('http') ? project.main_image_url : 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=600&h=400&q=80'}
-                      alt={project.title_ar}
-                      className="w-full h-full object-cover bg-slate-300"
-                      loading="lazy"
-                      whileHover={{ scale: 1.12 }}
-                      transition={{ duration: 0.8, ease: 'easeOut' }}
-                      onError={(e) => {
-                        const img = e.target as HTMLImageElement;
-                        if (!img.src.includes('fallback')) {
-                          img.src = 'https://images.unsplash.com/photo-1464226184837-280ecc440399?w=600&h=400&q=80&fallback=1';
-                        }
-                      }}
-                    />
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
+            {filteredProjects.map((project) => (
+              <motion.div
+                key={project.id}
+                variants={itemVariants}
+                whileHover={{ y: -15 }}
+                className="group relative bg-white rounded-[2rem] overflow-hidden shadow-lg border border-slate-100 hover:shadow-2xl transition-all duration-500"
+              >
+                {/* Image Container */}
+                <div className="relative h-80 overflow-hidden bg-slate-200">
+                  <motion.img
+                    src={project.main_image_url}
+                    alt={project.title_ar}
+                    className="w-full h-full object-cover"
+                    whileHover={{ scale: 1.12 }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      img.src = 'https://via.placeholder.com/600x500?text=' + project.title_ar;
+                    }}
+                  />
 
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                    {/* Location Badge */}
+                  {/* Location Badge */}
+                  <motion.div
+                    initial={{ x: -20, opacity: 0 }}
+                    whileHover={{ x: 0, opacity: 1 }}
+                    className="absolute top-4 right-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-5 py-2 rounded-full text-sm font-black shadow-lg"
+                  >
+                    📍 {project.location}
+                  </motion.div>
+
+                  {/* Featured Badge */}
+                  {project.is_featured && (
                     <motion.div
-                      initial={{ x: -20, opacity: 0 }}
-                      whileHover={{ x: 0, opacity: 1 }}
-                      className="absolute top-4 right-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-5 py-2 rounded-full text-sm font-black shadow-lg"
+                      animate={{ rotate: [0, 5, 0] }}
+                      transition={{ duration: 3, repeat: Infinity }}
+                      className="absolute top-4 left-4 bg-yellow-400 text-slate-900 px-4 py-2 rounded-full text-xs font-black flex items-center gap-2"
                     >
-                      📍 {project.location}
+                      ⭐ مشروع مميز
                     </motion.div>
+                  )}
+                </div>
 
-                    {/* Featured Badge */}
-                    {project.is_featured && (
-                      <motion.div
-                        animate={{ rotate: [0, 5, 0] }}
-                        transition={{ duration: 3, repeat: Infinity }}
-                        className="absolute top-4 left-4 bg-yellow-400 text-slate-900 px-4 py-2 rounded-full text-xs font-black flex items-center gap-2"
-                      >
-                        ⭐ مشروع مميز
-                      </motion.div>
-                    )}
+                {/* Content */}
+                <div className="p-8">
+                  <h3 className="text-2xl font-black text-slate-900 mb-4 leading-snug group-hover:text-emerald-600 transition-colors">
+                    {project.title_ar}
+                  </h3>
+
+                  <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-200">
+                    <span className="text-emerald-600 font-black text-lg">🌾</span>
+                    <p className="text-slate-600 font-bold">{project.crop_type}</p>
                   </div>
 
-                  {/* Content */}
-                  <div className="p-8">
-                    <h3 className="text-2xl font-black text-slate-900 mb-4 leading-snug group-hover:text-emerald-600 transition-colors">
-                      {project.title_ar}
-                    </h3>
-
-                    <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-200">
-                      <span className="text-emerald-600 font-black text-lg">🌾</span>
-                      <p className="text-slate-600 font-bold">{project.crop_type}</p>
+                  {/* Stats */}
+                  <div className="grid grid-cols-2 gap-4 mb-8 pb-8 border-b border-slate-200">
+                    <div>
+                      <div className="text-xs font-black text-slate-400 uppercase mb-2">حالة المشروع</div>
+                      <div className="text-emerald-600 font-black">✓ منفذ</div>
                     </div>
-
-                    {/* Stats */}
-                    <div className="grid grid-cols-2 gap-4 mb-8 pb-8 border-b border-slate-200">
-                      <div>
-                        <div className="text-xs font-black text-slate-400 uppercase mb-2">حالة المشروع</div>
-                        <div className="text-emerald-600 font-black">✓ منفذ</div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-black text-slate-400 uppercase mb-2">المدة الزمنية</div>
-                        <div className="text-slate-900 font-black">90 يوم</div>
-                      </div>
+                    <div>
+                      <div className="text-xs font-black text-slate-400 uppercase mb-2">المدة الزمنية</div>
+                      <div className="text-slate-900 font-black">90 يوم</div>
                     </div>
+                  </div>
 
-                    {/* Action Button */}
-                    <motion.button
-                      whileHover={{ x: 5 }}
-                      className="text-emerald-600 font-black text-lg flex items-center gap-3 hover:gap-5 transition-all w-full group/btn"
+                  {/* Action Button */}
+                  <motion.button
+                    whileHover={{ x: 5 }}
+                    className="text-emerald-600 font-black text-lg flex items-center gap-3 hover:gap-5 transition-all w-full group/btn"
+                  >
+                    <span>عرض التفاصيل</span>
+                    <motion.span
+                      animate={{ x: [0, 5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
                     >
-                      <span>عرض التفاصيل</span>
-                      <motion.span
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      >
-                        ←
-                      </motion.span>
-                    </motion.button>
-                  </div>
+                      ←
+                    </motion.span>
+                  </motion.button>
+                </div>
 
-                  {/* Hover Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
+                {/* Hover Effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+              </motion.div>
+            ))}
+          </motion.div>
 
           {/* Empty State */}
-          {!loading && filteredProjects.length === 0 && (
+          {filteredProjects.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

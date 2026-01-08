@@ -20,21 +20,12 @@ export const settingsService = {
   async updateSettings(settings: Partial<SiteSettings>): Promise<SiteSettings> {
     try {
       // الحصول على معرف الإعدادات (عادة يكون هناك سجل واحد فقط)
-      const { data: existingData, error: fetchError } = await supabase
+      const { data: existingData } = await supabase
         .from('site_settings')
         .select('id')
-        .limit(1);
+        .single();
       
-      if (fetchError) {
-        console.error('Error fetching existing settings:', fetchError);
-        throw new Error(`خطأ في جلب الإعدادات: ${fetchError.message}`);
-      }
-      
-      if (!existingData || existingData.length === 0) {
-        throw new Error('لم يتم العثور على سجل الإعدادات في قاعدة البيانات');
-      }
-      
-      const settingsId = existingData[0].id;
+      const settingsId = existingData?.id || settings.id;
       
       const { data, error } = await supabase
         .from('site_settings')
@@ -43,15 +34,7 @@ export const settingsService = {
         .select()
         .single();
       
-      if (error) {
-        console.error('Error updating settings:', error);
-        throw new Error(`خطأ في تحديث الإعدادات: ${error.message}`);
-      }
-      
-      if (!data) {
-        throw new Error('فشل في استرجاع الإعدادات بعد التحديث');
-      }
-      
+      if (error) throw error;
       return data;
     } catch (error) {
       console.error('Error updating settings:', error);

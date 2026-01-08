@@ -57,7 +57,7 @@ const App: React.FC = () => {
             <>
               <Navbar settings={settings} />
               <main className="flex-grow">
-                <Home settings={settings} />
+                <Home key={settings.id} settings={settings} />
               </main>
               <Footer settings={settings} />
             </>

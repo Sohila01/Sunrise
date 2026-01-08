@@ -11,6 +11,7 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
   const [submitted, setSubmitted] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
+  const [projectsLoaded, setProjectsLoaded] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,19 +31,32 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // Load featured projects
+  // Load featured projects once
   useEffect(() => {
     const loadProjects = async () => {
+      if (projectsLoaded) return; // تحميل مرة واحدة فقط
       try {
         const projects = await projectsService.getProjects();
         const featured = projects.filter(p => p.is_featured).slice(0, 3);
         setFeaturedProjects(featured);
+        setProjectsLoaded(true);
       } catch (error) {
         console.error('Error loading projects:', error);
       }
     };
     loadProjects();
-  }, []);
+  }, [projectsLoaded]);
+
+  // دالة لإعادة تحميل المشاريع يدويًا
+  const refreshProjects = async () => {
+    try {
+      const projects = await projectsService.getProjects();
+      const featured = projects.filter(p => p.is_featured).slice(0, 3);
+      setFeaturedProjects(featured);
+    } catch (error) {
+      console.error('Error refreshing projects:', error);
+    }
+  };
 
   return (
     <div className="relative">
@@ -218,9 +232,17 @@ const Home: React.FC<{ settings: SiteSettings }> = ({ settings }) => {
 
       {/* 4. FEATURED PROJECTS */}
       <section id="projects" className="py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-6 mb-20">
+        <div className="max-w-7xl mx-auto px-6 mb-20 flex justify-between items-center">
+          <div>
             <h2 className="text-5xl font-black text-slate-900 mb-6">مشاريع في دائرة الضوء</h2>
             <p className="text-slate-500 text-xl font-medium">قصص نجاح سطرناها مع شركائنا في مختلف بقاع مصر</p>
+          </div>
+          <button 
+            onClick={refreshProjects}
+            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg"
+          >
+            🔄 تحديث
+          </button>
         </div>
         
         <div className="flex flex-col md:flex-row gap-8 px-6 max-w-[1600px] mx-auto overflow-hidden">
